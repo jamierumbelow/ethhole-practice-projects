@@ -21,11 +21,12 @@ contract Voting {
     }
 
     uint256 internal electionIdCounter = 1;
-    mapping(address => uint256[]) public ownerElectionIds;
+    mapping(address => mapping(uint256 => bool)) public ownerElectionIds;
     mapping(uint256 => Election) public elections;
 
-    mapping(uint256 => Candidate[]) public electionCandidates;
-    mapping(address => uint256[]) public candidatesElections;
+    mapping(uint256 => mapping(address => bool)) public electionCandidates;
+    mapping(uint256 => Candidate[]) public electionCandidatesList;
+    mapping(address => mapping(uint256 => bool)) public candidatesElections;
 
     // electionId => [ voterAddress => candidateAddress ]
     mapping(uint256 => mapping(address => address)) public votes;
@@ -84,6 +85,10 @@ contract Voting {
             block.timestamp < elections[_electionId].endRegistrationAt,
             "can't register after registration has closed"
         );
+        require(
+            electionCandidates[_electionId][msg.sender] == false,
+            "can't reregister an already-existing candidate"
+        );
 
         _registerAsCandidate(_electionId, _name);
     }
@@ -100,7 +105,7 @@ contract Voting {
         uint256 _endVotingAt
     ) internal returns (uint256) {
         uint256 _electionId = _nextElectionId();
-        ownerElectionIds[_owner].push(_electionId);
+        ownerElectionIds[_owner][_electionId] = true;
         elections[_electionId] = Election(
             _title,
             _beginRegistrationAt,
@@ -114,8 +119,9 @@ contract Voting {
     function _registerAsCandidate(uint256 _electionId, string memory _name)
         internal
     {
-        electionCandidates[_electionId].push(Candidate(msg.sender, _name));
-        candidatesElections[msg.sender].push(_electionId);
+        electionCandidates[_electionId][msg.sender] = true;
+        candidatesElections[msg.sender][_electionId] = true;
+        electionCandidatesList[_electionId].push(Candidate(msg.sender, _name));
     }
 
     function _nextElectionId() internal returns (uint256) {
