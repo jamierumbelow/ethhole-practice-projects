@@ -34,7 +34,7 @@ contract Voting {
 
     // electionId => [ voterAddress => bool ]
     mapping(uint256 => mapping(address => bool)) public hasVoted;
-    // electionId => [ voterAddress => voteCount ]
+    // electionId => [ candidateAddress => voteCount ]
     mapping(uint256 => mapping(address => uint256)) public candidateVotes;
 
     // Public Functions
@@ -109,11 +109,58 @@ contract Voting {
             "_candidate not registered in _electionId"
         );
         require(
+            block.timestamp > elections[_electionId].beginVotingAt,
+            "can't vote before voting has started"
+        );
+        require(
             hasVoted[_electionId][msg.sender] != true,
             "can't vote more than once"
         );
 
         _vote(_electionId, _candidate);
+    }
+
+    function getWinner(uint256 _electionId)
+        public
+        view
+        returns (Candidate memory winner, bool tie)
+    {
+        require(
+            elections[_electionId].beginRegistrationAt != 0,
+            "unknown _electionId"
+        );
+        require(
+            block.timestamp < elections[_electionId].endVotingAt,
+            "can't get winner before voting has closed"
+        );
+
+        tie = false;
+        winner = electionCandidatesList[_electionId][0];
+        uint256 currWinningVotes = 0;
+        uint256 currWinningIndex = 0;
+
+        for (
+            uint256 index = 0;
+            index < electionCandidatesList[_electionId].length;
+            index++
+        ) {
+            Candidate memory candidate =
+                electionCandidatesList[_electionId][index];
+
+            if (
+                candidateVotes[_electionId][candidate.owner] > currWinningVotes
+            ) {
+                currWinningIndex = index;
+                currWinningVotes = candidateVotes[_electionId][candidate.owner];
+                winner = candidate;
+            } else if (
+                candidateVotes[_electionId][candidate.owner] ==
+                currWinningVotes &&
+                currWinningIndex != index
+            ) {
+                tie = true;
+            }
+        }
     }
 
     // Private Functions

@@ -7,7 +7,7 @@ Create a dapp for voting where all of the votes and candidate registration happe
     $ v = await Voting.deployed();
     $ admin = accounts[0]; bobby = accounts[1]; carlos = accounts[2]; susie = accounts[3]; voter1 = accounts[4]; voter2 = accounts[5]; voter3 = accounts[6];
 
-    $ v.createElection("Test", Math.floor(Date.now() / 1000) + 1, Math.floor(Date.now() / 1000) + 120, Math.floor(Date.now() / 1000) + 121, Math.floor(Date.now() / 1000) + 120*2, { from: admin });
+    $ v.createElection("Test", Math.floor(Date.now() / 1000) + 1, Math.floor(Date.now() / 1000) + 60, Math.floor(Date.now() / 1000) + 61, Math.floor(Date.now() / 1000) + 60*2, { from: admin });
 
     $ v.registerAsCandidate(1, "Bobby Wantsavote", { from: bobby });
     $ v.registerAsCandidate(1, "Corporate Carlos", { from: carlos });
@@ -29,10 +29,14 @@ Create a dapp for voting where all of the votes and candidate registration happe
       name: 'Corporate Carlos'
     }
 
-    // wait 2 mins
+    // wait 1 min
 
     $ v.registerAsCandidate(1, "Tardy Susie", { from: susie }); // error  reason: "can't register after registration has closed",
 
     $ v.vote(1, bobby, { from: voter1 });
     $ v.vote(1, bobby, { from: voter2 });
     $ v.vote(1, carlos, { from: voter3 });
+
+    // wait 1 min
+
+    $ v.getWinner(1, { from: admin })
