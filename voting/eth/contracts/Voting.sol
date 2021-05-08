@@ -85,8 +85,7 @@ contract Voting {
             "can't register after registration has closed"
         );
 
-        electionCandidates[_electionId].push(Candidate(msg.sender, _name));
-        candidatesElections[msg.sender].push(_electionId);
+        _registerAsCandidate(_electionId, _name);
     }
 
     // Private Functions
@@ -110,6 +109,13 @@ contract Voting {
             _endVotingAt
         );
         return _electionId;
+    }
+
+    function _registerAsCandidate(uint256 _electionId, string memory _name)
+        internal
+    {
+        electionCandidates[_electionId].push(Candidate(msg.sender, _name));
+        candidatesElections[msg.sender].push(_electionId);
     }
 
     function _nextElectionId() internal returns (uint256) {
