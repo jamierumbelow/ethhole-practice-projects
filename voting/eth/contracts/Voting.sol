@@ -21,15 +21,21 @@ contract Voting {
     }
 
     uint256 internal electionIdCounter = 1;
+
+    // ownerAddress => [ electionId => included ]
     mapping(address => mapping(uint256 => bool)) public ownerElectionIds;
     mapping(uint256 => Election) public elections;
 
+    // electionId => [ candidateAddress => included ]
     mapping(uint256 => mapping(address => bool)) public electionCandidates;
     mapping(uint256 => Candidate[]) public electionCandidatesList;
+    // candidateAddress => [ electionId => included ]
     mapping(address => mapping(uint256 => bool)) public candidatesElections;
 
-    // electionId => [ voterAddress => candidateAddress ]
-    mapping(uint256 => mapping(address => address)) public votes;
+    // electionId => [ voterAddress => bool ]
+    mapping(uint256 => mapping(address => bool)) public hasVoted;
+    // electionId => [ voterAddress => voteCount ]
+    mapping(uint256 => mapping(address => uint256)) public candidateVotes;
 
     // Public Functions
     // -------------------------------------------------------------------------
@@ -93,6 +99,23 @@ contract Voting {
         _registerAsCandidate(_electionId, _name);
     }
 
+    function vote(uint256 _electionId, address _candidate) public {
+        require(
+            elections[_electionId].beginRegistrationAt != 0,
+            "unknown _electionId"
+        );
+        require(
+            candidatesElections[_candidate][_electionId] == true,
+            "_candidate not registered in _electionId"
+        );
+        require(
+            hasVoted[_electionId][msg.sender] != true,
+            "can't vote more than once"
+        );
+
+        _vote(_electionId, _candidate);
+    }
+
     // Private Functions
     // -------------------------------------------------------------------------
 
@@ -122,6 +145,11 @@ contract Voting {
         electionCandidates[_electionId][msg.sender] = true;
         candidatesElections[msg.sender][_electionId] = true;
         electionCandidatesList[_electionId].push(Candidate(msg.sender, _name));
+    }
+
+    function _vote(uint256 _electionId, address _candidate) internal {
+        hasVoted[_electionId][msg.sender] = true;
+        candidateVotes[_electionId][_candidate]++;
     }
 
     function _nextElectionId() internal returns (uint256) {
