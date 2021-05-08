@@ -20,7 +20,7 @@ contract Voting {
         uint256 endVotingAtBlock;
     }
 
-    uint256 internal electionIdCounter = 0;
+    uint256 internal electionIdCounter = 1;
     mapping(address => uint256[]) public ownerElectionIds;
     mapping(uint256 => Election) public elections;
     mapping(uint256 => Candidate[]) public candidates;
@@ -77,16 +77,16 @@ contract Voting {
         uint256 _beginVotingAtBlock,
         uint256 _endVotingAtBlock
     ) internal returns (uint256) {
-        uint256 electionId = _nextElectionId();
-        ownerElectionIds[_owner].push(electionId);
-        elections[electionId] = Election(
+        uint256 _electionId = _nextElectionId();
+        ownerElectionIds[_owner].push(_electionId);
+        elections[_electionId] = Election(
             _title,
             _beginRegistrationAtBlock,
             _endRegistrationAtBlock,
             _beginVotingAtBlock,
             _endVotingAtBlock
         );
-        return electionId;
+        return _electionId;
     }
 
     function _nextElectionId() internal returns (uint256) {
