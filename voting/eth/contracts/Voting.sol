@@ -25,6 +25,7 @@ contract Voting {
     // ownerAddress => [ electionId => included ]
     mapping(address => mapping(uint256 => bool)) public ownerElectionIds;
     mapping(uint256 => Election) public elections;
+    uint256[] public allElections;
 
     // electionId => [ candidateAddress => included ]
     mapping(uint256 => mapping(address => bool)) public electionCandidates;
@@ -163,6 +164,10 @@ contract Voting {
         }
     }
 
+    function getAllElectionsLength() public view returns (uint256) {
+        return allElections.length;
+    }
+
     // Private Functions
     // -------------------------------------------------------------------------
 
@@ -183,6 +188,7 @@ contract Voting {
             _beginVotingAt,
             _endVotingAt
         );
+        allElections.push(_electionId);
         return _electionId;
     }
 

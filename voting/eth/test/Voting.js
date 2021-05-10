@@ -58,9 +58,13 @@ contract("Voting", async (accounts) => {
     const v = await Voting.deployed();
     const now = Math.floor(Date.now() / 1000) + 1;
 
+    const len = await v.getAllElectionsLength();
+
     await v.createElection("Test", now + 1, now + 2, now + 3, now + 4, {
       from: admin,
     });
+
+    assert.equal((await v.getAllElectionsLength()).gt(len), true);
   });
 
   // register candidates
