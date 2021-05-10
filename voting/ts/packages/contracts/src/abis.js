@@ -1,9 +1,5 @@
-import erc20Abi from "./abis/erc20.json";
-import ownableAbi from "./abis/ownable.json";
+import VotingAbi from "./abis/Voting.json";
 
-const abis = {
-  erc20: erc20Abi,
-  ownable: ownableAbi,
+export default {
+  voting: VotingAbi.abi,
 };
-
-export default abis;
