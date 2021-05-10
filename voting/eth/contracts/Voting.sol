@@ -114,6 +114,10 @@ contract Voting {
             "can't vote before voting has started"
         );
         require(
+            block.timestamp < elections[_electionId].endVotingAt,
+            "can't vote after voting has ended"
+        );
+        require(
             hasVoted[_electionId][msg.sender] != true,
             "can't vote more than once"
         );
@@ -131,7 +135,7 @@ contract Voting {
             "unknown _electionId"
         );
         require(
-            block.timestamp < elections[_electionId].endVotingAt,
+            block.timestamp > elections[_electionId].endVotingAt,
             "can't get winner before voting has closed"
         );
 
