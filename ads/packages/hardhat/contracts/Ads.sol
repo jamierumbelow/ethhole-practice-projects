@@ -17,5 +17,19 @@ contract Ads {
         // what should we do on deploy?
     }
 
-    function bid() public payable {}
+    function buy(
+        string memory _newCtaUrl,
+        string memory _newImageUrl,
+        string memory _newText
+    ) public payable {
+        require(
+            msg.value > currentPrice,
+            "you must buy for higher than the currentPrice"
+        );
+
+        ctaUrl = _newCtaUrl;
+        imageUrl = _newImageUrl;
+        text = _newText;
+        currentPrice = msg.value;
+    }
 }

@@ -4,8 +4,6 @@ import { useContractLoader, useContractReader } from "../hooks";
 
 const AdDisplay = ({ provider }) => {
   const readContracts = useContractLoader(provider);
-  const writeContracts = useContractLoader(provider);
-
   const ctaUrl = useContractReader(readContracts, "Ads", "ctaUrl");
   const imageUrl = useContractReader(readContracts, "Ads", "imageUrl");
   const text = useContractReader(readContracts, "Ads", "text");
@@ -15,7 +13,7 @@ const AdDisplay = ({ provider }) => {
   return (
     <Card size="large" style={{ marginTop: 25, width: "100%" }} loading={loading}>
       <a href={ctaUrl} style={{ display: "flex", flexDirection: "column" }}>
-        <p style={{ width: "25%", textAlign: "center" }}>
+        <p style={{ width: "25%", textAlign: "center", marginLeft: "auto", marginRight: "auto" }}>
           <img src={imageUrl} alt={text} />
         </p>
         {text}
